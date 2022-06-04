@@ -107,16 +107,16 @@ mbutton5.grid(row=10, column=1, padx=5, pady=10)
 # display screen in homework page
 # tab2_display = ScrolledText(tab2, height=5)
 # tab2_display.grid(row=7, column=0, padx=5, pady=5, columnspan=3)
-parts_list = Listbox(tab2, height=8, width=80, border=0)
-parts_list.grid(row=15, column=0, columnspan=3, rowspan=6, pady=20, padx=10)
+hw = Listbox(tab2, height=8, width=80, border=0)
+hw.grid(row=15, column=0, columnspan=3, rowspan=6, pady=20, padx=10)
 # Create scrollbar
 scrollbar = Scrollbar(tab2)
 scrollbar.grid(row=15, column = 3)
 # Set scrollbar to listbox
-parts_list.configure(yscrollcommand=scrollbar.set)
-scrollbar.configure(command=parts_list.yview)
+hw.configure(yscrollcommand=scrollbar.set)
+scrollbar.configure(command=hw.yview)
 # Bind select
-#parts_list.bind('<<ListboxSelect>>', select_item)
+#hw.bind('<<ListboxSelect>>', select_item)
 
 # about Page
 abt = Label(tab4, text='This application helps add tasks\n\nApplication designed by Venu\n\nCopyright \u00A9 Venu', padx = 10, pady = 10)
