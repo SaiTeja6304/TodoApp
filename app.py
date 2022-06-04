@@ -9,6 +9,11 @@ from db import Database
 
 db = Database("tasks.db")
 
+def populate_list():
+    hw.delete(0, END)
+    for row in db.fetch():
+        hw.insert(END, row)
+
 app = Tk()
 
 # basic structure
