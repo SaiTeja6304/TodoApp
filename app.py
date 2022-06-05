@@ -9,17 +9,42 @@ from db import Database
 
 db = Database("tasks.db")
 
-def populate_list():
-    hw.delete(0, END)
+def view():
     for row in db.fetch():
-        hw.insert(END, row)
+        tree.insert("",tk.END,values=row)
+        print(row)
+        #tab2_display.insert(tk.END,row)
+
+def clear_text():
+    entry_tname.delete('0', END)
+    entry_des.delete('0', END)
+    entry_sub.delete('0', END)
+    entry_date.delete('0', END)
+    entry_subject.delete('0', END)
+
+# def clear_display_result():
+#     tab2_display.delete('1.0', END)
+
+def add_details():
+    name = str(entry_tname.get())
+    des = str(entry_des.get())
+    mob = str(entry_sub.get())
+    dd = str(entry_date.get())
+    sub = str(entry_subject.get())
+    if name == '' or des == '' or mob == '' or dd == '' or sub == '':
+        messagebox.showerror('Required Fields', 'Please include all fields')
+    else:
+        db.add(name, des, mob, dd, sub)
+        result = '\nTask:{}, \nDescription:{}, \nMethod of Submission:{}, \nDue Date:{}, \nSubject:{}'
+        #tab2_display.insert(tk.END,result)
+        messagebox.showinfo(title='TODO APPLICATION', message='Task successfully created')
 
 app = Tk()
 
 # basic structure
 app.title('TODO APPLICATION')
 # size of window
-app.geometry('780x450')
+app.geometry('1150x550')
 # background color
 app.configure(background='red')
 
@@ -94,10 +119,10 @@ entry_subject = Entry(tab2, textvariable=subject, width=50)
 entry_subject.grid(column=1, row=5)
 
 # buttons creation
-mbutton1 = Button(tab2, text='Add', width=12, bg='#03A9F4', fg='#fff')
+mbutton1 = Button(tab2, text='Add', width=12, bg='#03A9F4', fg='#fff', command=add_details)
 mbutton1.grid(row=6, column=0, padx=5, pady=10)
 
-mbutton2 = Button(tab2, text='Clear', width=12, bg='#03A9F4', fg='#fff')
+mbutton2 = Button(tab2, text='Clear', width=12, bg='#03A9F4', fg='#fff', command=clear_text)
 mbutton2.grid(row=10, column=0, padx=5, pady=10)
 
 mbutton3 = Button(tab2, text='Update', width=12, bg='#03A9F4', fg='#fff')
@@ -110,21 +135,34 @@ mbutton5 = Button(tab2, text='Completed', width=12, bg='#03A9F4', fg='#fff')
 mbutton5.grid(row=10, column=1, padx=5, pady=10)
 
 # display screen in homework page
-# tab2_display = ScrolledText(tab2, height=5)
-# tab2_display.grid(row=7, column=0, padx=5, pady=5, columnspan=3)
-hw = Listbox(tab2, height=8, width=80, border=0)
-hw.grid(row=15, column=0, columnspan=3, rowspan=6, pady=20, padx=10)
-# Create scrollbar
-scrollbar = Scrollbar(tab2)
-scrollbar.grid(row=15, column = 3)
-# Set scrollbar to listbox
-hw.configure(yscrollcommand=scrollbar.set)
-scrollbar.configure(command=hw.yview)
-# Bind select
-#hw.bind('<<ListboxSelect>>', select_item)
+tab2_display = ScrolledText(tab2, height=5)
+tab2_display.grid(row=7, column=0, padx=5, pady=5, columnspan=3)
+# hw = Listbox(tab2, height=8, width=80, border=0)
+# hw.grid(row=15, column=0, columnspan=3, rowspan=6, pady=20, padx=10)
+# # Create scrollbar
+# scrollbar = Scrollbar(tab2)
+# scrollbar.grid(row=15, column = 3)
+# # Set scrollbar to listbox
+# hw.configure(yscrollcommand=scrollbar.set)
+# scrollbar.configure(command=hw.yview)
+# # Bind select
+# #hw.bind('<<ListboxSelect>>', select_item)
+tree = ttk.Treeview(tab2, column=('column1', 'column2', 'column3', 'column4', 'column5'), show='headings')
+tree.heading('#1', text='Task')
+tree.heading('#2', text='Description')
+tree.heading('#3', text='Method of submission')
+tree.heading('#4', text='Due date')
+tree.heading('#5', text='Subject')
+tree.grid(row=7, column=0, columnspan=100, padx=5, pady=5)
 
 # about Page
 abt = Label(tab4, text='This application helps add tasks\n\nApplication designed by Venu\n\nCopyright \u00A9 Venu', padx = 10, pady = 10)
 abt.grid(column=0, row=1)
+
+# export page
+b1 = Button(tab3, text='export to csv', width=12, bg='#03A9F4', fg='#fff')
+b1.grid(row=2, column=1, padx=5, pady=10)
+
+#populate_list()
 
 app.mainloop()
