@@ -6,14 +6,16 @@ from tkcalendar import Calendar, DateEntry
 from tkinter.scrolledtext import *
 from tkinter import messagebox
 from db import Database
+import csv
 
 db = Database("tasks.db")
 
 def view():
+    # for row in db.fetch():
+    #     tree.insert("",tk.END,values=row)
+    hw.delete(0, END)
     for row in db.fetch():
-        tree.insert("",tk.END,values=row)
-        print(row)
-        #tab2_display.insert(tk.END,row)
+        hw.insert(END, row)
 
 def clear_text():
     entry_tname.delete('0', END)
@@ -21,9 +23,6 @@ def clear_text():
     entry_sub.delete('0', END)
     entry_date.delete('0', END)
     entry_subject.delete('0', END)
-
-# def clear_display_result():
-#     tab2_display.delete('1.0', END)
 
 def add_details():
     name = str(entry_tname.get())
@@ -38,6 +37,54 @@ def add_details():
         result = '\nTask:{}, \nDescription:{}, \nMethod of Submission:{}, \nDue Date:{}, \nSubject:{}'
         #tab2_display.insert(tk.END,result)
         messagebox.showinfo(title='TODO APPLICATION', message='Task successfully created')
+    clear_text()
+    view()
+
+def export_as_csv():
+    filename = str(entry_filename.get())
+    myfilename = filename + '.csv'
+    with open(myfilename, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['No','Task','Description','Method of submission','Due Date','Subject'])
+        writer.writerows(db.fetch())
+        messagebox.showinfo(title='TODO APPLICATION', message='"Exported As {}'.format(myfilename))
+
+def select_item(event):
+    try:
+        global selected_item
+        index = hw.curselection()[0]
+        selected_item = hw.get(index)
+
+        entry_tname.delete(0, END)
+        entry_tname.insert(END, selected_item[1])
+        entry_des.delete(0, END)
+        entry_des.insert(END, selected_item[2])
+        entry_sub.delete(0, END)
+        entry_sub.insert(END, selected_item[3])
+        entry_date.delete(0, END)
+        entry_date.insert(END, selected_item[4])
+        entry_subject.delete(0, END)
+        entry_subject.insert(END, selected_item[5])
+    except IndexError:
+        pass
+
+def remove_task():
+    db.remove(selected_item[0])
+    clear_text()
+    messagebox.showinfo(title='TODO APPLICATION', message='Task successfully deleted')
+    view()
+
+def update_task():
+    db.update(selected_item[0], entry_tname.get(), entry_des.get(), entry_sub.get(), entry_date.get(), entry_subject.get())
+    clear_text()
+    messagebox.showinfo(title='TODO APPLICATION', message='Task successfully updated')
+    view()
+
+def completed_task():
+    db.remove(selected_item[0])
+    clear_text()
+    messagebox.showinfo(title='TODO APPLICATION', message='Task marked complete')
+    view()
 
 app = Tk()
 
@@ -125,44 +172,52 @@ mbutton1.grid(row=6, column=0, padx=5, pady=10)
 mbutton2 = Button(tab2, text='Clear', width=12, bg='#03A9F4', fg='#fff', command=clear_text)
 mbutton2.grid(row=10, column=0, padx=5, pady=10)
 
-mbutton3 = Button(tab2, text='Update', width=12, bg='#03A9F4', fg='#fff')
+mbutton3 = Button(tab2, text='Update', width=12, bg='#03A9F4', fg='#fff', command=update_task)
 mbutton3.grid(row=6, column=1, padx=5, pady=10)
 
-mbutton4 = Button(tab2, text='Delete', width=12, bg='#03A9F4', fg='#fff')
+mbutton4 = Button(tab2, text='Delete', width=12, bg='#03A9F4', fg='#fff', command=remove_task)
 mbutton4.grid(row=6, column=2, padx=5, pady=10)
 
 mbutton5 = Button(tab2, text='Completed', width=12, bg='#03A9F4', fg='#fff')
 mbutton5.grid(row=10, column=1, padx=5, pady=10)
 
 # display screen in homework page
-tab2_display = ScrolledText(tab2, height=5)
-tab2_display.grid(row=7, column=0, padx=5, pady=5, columnspan=3)
-# hw = Listbox(tab2, height=8, width=80, border=0)
-# hw.grid(row=15, column=0, columnspan=3, rowspan=6, pady=20, padx=10)
-# # Create scrollbar
-# scrollbar = Scrollbar(tab2)
-# scrollbar.grid(row=15, column = 3)
-# # Set scrollbar to listbox
-# hw.configure(yscrollcommand=scrollbar.set)
-# scrollbar.configure(command=hw.yview)
-# # Bind select
-# #hw.bind('<<ListboxSelect>>', select_item)
-tree = ttk.Treeview(tab2, column=('column1', 'column2', 'column3', 'column4', 'column5'), show='headings')
-tree.heading('#1', text='Task')
-tree.heading('#2', text='Description')
-tree.heading('#3', text='Method of submission')
-tree.heading('#4', text='Due date')
-tree.heading('#5', text='Subject')
-tree.grid(row=7, column=0, columnspan=100, padx=5, pady=5)
+# tab2_display = ScrolledText(tab2, height=5)
+# tab2_display.grid(row=7, column=0, padx=5, pady=5, columnspan=3)
+hw = Listbox(tab2, height=8, width=80, border=0)
+hw.grid(row=15, column=0, columnspan=3, rowspan=6, pady=20, padx=10)
+#Create scrollbar
+scrollbar = Scrollbar(tab2)
+scrollbar.grid(row=15, column = 3)
+#Set scrollbar to listbox
+hw.configure(yscrollcommand=scrollbar.set)
+scrollbar.configure(command=hw.yview)
+#Bind select
+hw.bind('<<ListboxSelect>>', select_item)
+# tree = ttk.Treeview(tab2, column=('column1', 'column2', 'column3', 'column4', 'column5', 'column6'), show='headings')
+# tree.heading('#1', text='No')
+# tree.heading('#2', text='Task')
+# tree.heading('#3', text='Description')
+# tree.heading('#4', text='Method of submission')
+# tree.heading('#5', text='Due date')
+# tree.heading('#6', text='Subject')
+# tree.grid(row=7, column=0, columnspan=200, padx=0, pady=5)
 
 # about Page
 abt = Label(tab4, text='This application helps add tasks\n\nApplication designed by Venu\n\nCopyright \u00A9 Venu', padx = 10, pady = 10)
 abt.grid(column=0, row=1)
 
 # export page
-b1 = Button(tab3, text='export to csv', width=12, bg='#03A9F4', fg='#fff')
-b1.grid(row=2, column=1, padx=5, pady=10)
+label_export1 = Label(tab3, text='File Name:',padx=5,pady=5)
+label_export1.grid(column=0,row=2)
+filename_raw_entry = StringVar()
+entry_filename = Entry(tab3, textvariable=filename_raw_entry, width=30)
+entry_filename.grid(row=2,column=1)
 
-#populate_list()
+b1 = Button(tab3, text='Export to CSV', width=12, bg='#03A9F4', fg='#fff',command=export_as_csv)
+b1.grid(row=3, column=1, padx=10, pady=10)
+
+
+view()
 
 app.mainloop()
