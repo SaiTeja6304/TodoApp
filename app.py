@@ -217,7 +217,7 @@ entry_filename.grid(row=2,column=1)
 b1 = Button(tab3, text='Export to CSV', width=12, bg='#03A9F4', fg='#fff',command=export_as_csv)
 b1.grid(row=3, column=1, padx=10, pady=10)
 
-
+# function call to display data
 view()
 
 app.mainloop()
